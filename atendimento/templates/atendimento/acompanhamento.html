@@ -1,0 +1,335 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <title>Acompanhamento {% firstof atendimento.sigla_senha '' %}</title>
+    <style>
+        *{
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container py-3">
+        <header>
+            <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
+                <a href="/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
+                    <img width="50px" src="{% static 'intranet/atendimento/favicon.png' %}" alt="logo">
+                </a>
+                
+                <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+                    <a class="me-3 py-2 link-body-emphasis text-decoration-none">
+                        {% firstof atendimento.unidade.nome 'Unidade' %}
+                    </a>
+                </nav>
+            </div>
+        </header>
+        
+        <main>
+            <div class="row row-cols-1 row-cols-md-3 mb-3" style="justify-content: center">
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">
+                                {% if atendimento.id %}
+                                    {% if atendimento.avaliacao %}
+                                        <b>Obrigado por avaliar</b>
+                                    {% else %}
+                                        Acompanhamento
+                                    {% endif %}
+                                {% else %}
+                                    Acompanhamento
+                                {% endif %}
+
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            {% if atendimento.id %}
+                                <div class="m-auto">
+                                    <img width="50" src="{% static 'intranet/atendimento/favicon.png' %}" alt="logo">
+                                </div>
+                                <h1 class="card-title pricing-card-title">{% firstof atendimento.sigla_senha '-' %}</h1>
+                                <ul class="list-unstyled mt-3 mb-4">
+                                    <li>{{atendimento.servico.nome}}</li>
+                                    {% if atendimento.atendente %}
+                                        <li>Atendente {{atendimento.atendente.usuario.first_name}}</li>
+                                        <li>{{atendimento.atendente.local.nome}} {{atendimento.atendente.numero_local}}</li>
+                                    {% endif %}
+                                    {% if atendimento.data_chegada %}
+                                        <li>Chegada: {{atendimento.data_chegada|date:"d/m/Y H:i"}}</li>
+                                    {% endif %}
+                                    {% if atendimento.data_chamada %}
+                                        <li>Chamada: {{atendimento.data_chamada|date:"d/m/Y H:i"}}</li>
+                                    {% endif %}
+                                    {% if atendimento.data_inicio %}
+                                        <li>Atendido: {{atendimento.data_inicio|date:"d/m/Y H:i"}}</li>
+                                    {% endif %}
+                                    {% if atendimento.data_fim %}
+                                        <li>Encerrado: {{atendimento.data_fim|date:"d/m/Y H:i"}}</li>
+                                    {% endif %}
+
+                                </ul>
+                                <!-- Button trigger modal -->
+                                <button type="button" class="w-100 btn btn-lg btn-{% if atendimento.status_atendimento == 'chamado' %}success{%else%}secondary{% endif %}" data-bs-toggle="modal" data-bs-target="#ModalStatusInfo">
+                                    <span id="status_atendimento"></span>
+                                </button>
+                                
+                                <!-- Modal -->
+                                <div class="modal fade" id="ModalStatusInfo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes de Status</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <ul class="d-grid gap-3 my-3 list-unstyled small">
+                                                    <li>
+                                                        <div>
+                                                            <h5 class="mb-0">Em fila</h5>
+                                                            Senha na fila aguardando ser chamada
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <h5 class="mb-0">Chamada</h5>
+                                                            Status quando a senha foi chamada no Painel
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <h5 class="mb-0">Não Compareceu</h5>
+                                                            Quando, após várias chamadas, o cliente não compareceu à chamada de atendimento
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <h5 class="mb-0">Transferido</h5>
+                                                            Quando o assunto/serviço relacionado à senha emitida tem relação com outro departamento de atendimento. Após transferência, o cliente pertencerá ao grupo prioritário de atendimento conforme a fila do departamento competente
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <h5 class="mb-0">Iniciado</h5>
+                                                            Status atualizado pelo atendente quando iniciado o atendimento
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div>
+                                                            <h5 class="mb-0">Encerrado</h5>
+                                                            Quando o atendimento foi completamente finalizado
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <button type="button" class="mx-1 my-1 btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if atendimento.status_atendimento == 'encerrado' %}
+                                    {%if not atendimento.avaliacao is None %}
+                                        <button type="button" class="my-1 w-100 btn btn-lg btn-primary">
+                                            Avaliado
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="yellow">
+                                                <path d="M12 .587l3.668 7.431 8.208 1.192-5.938 5.787 1.402 8.165L12 18.897l-7.34 3.865 1.402-8.165-5.938-5.787 8.208-1.192z"/>
+                                            </svg>
+                                        </button>
+
+                                    {% else %}
+                                        <!-- Button trigger modal -->
+                                        <button type="button" class="my-1 w-100 btn btn-lg btn-success" data-bs-toggle="modal" data-bs-target="#ModalAvaliar">
+                                            Avaliar
+                                        </button>
+                                        
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="ModalAvaliar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Avaliar Atendimento</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row row-cols-12 text-center">
+                                                            <div>Clique para uma nota de avaliação de atendimento</div>
+                                                            <div class="my-4" style="display: inline-flex; justify-content:center">
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="1" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-danger"><b>1</b></button>
+                                                                </form>
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="2" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-danger"><b>2</b></button>
+                                                                </form>
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="3" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-danger"><b>3</b></button>
+                                                                </form>
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="4" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-danger"><b>4</b></button>
+                                                                </form>
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="5" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-warning"><b>5</b></button>
+                                                                </form>
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="6" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-warning"><b>6</b></button>
+                                                                </form>
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="7" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-warning"><b>7</b></button>
+                                                                </form>
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="8" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-success"><b>8</b></button>
+                                                                </form>
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="9" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-success"><b>9</b></button>
+                                                                </form>
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" value="10" name="avaliacao">
+                                                                    <button type="submit" class="my-1 mx-1 btn btn-sm btn-success"><b>10</b></button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="mx-1 my-1 btn btn-success" data-bs-dismiss="modal">Fechar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                SENHA <b>{{pk}}|{{senha}}</b> NÃO ENCONTRADA
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+
+    <script>
+        const atendimento_encerrado = ['encerrado','nao_compareceu'].includes('{{atendimento.status_atendimento}}');
+        const to_status_atendimento = (status) =>{
+                switch(status){
+                    case 'iniciado': return 'Iniciado';
+                    case 'encerrado': return 'Encerrado';
+                    case 'nao_compareceu': return 'Não Compareceu';
+                    case 'chamado': return 'Chamada';
+                    case 'emitido': return 'Em fila';
+                    case 'transferido': return 'Transferido';
+                    default: 'parado';
+                }
+            }
+
+        const status_atendimento = document.getElementById('status_atendimento')
+        status_atendimento.innerHTML = to_status_atendimento('{{atendimento.status_atendimento}}')
+
+        if(atendimento_encerrado){
+            // nao atualizar
+        }else{
+            setInterval(()=>{
+                window.location.reload()
+            }, 10000)
+            
+            var ws_socket = null;
+            const app = 'atendimento-acompanhamento'
+            const ws_channel = 'channel_painel_atendimento_'+'{{atendimento.unidade.id}}'
+            const debug = false
+    
+            const initialize_ws = ()=>{
+                let url_ws = '{{ host_backend }}'
+                var connectionString = (window.location.protocol == 'https:' ? 'wss://' : 'ws://')+ url_ws + '/ws/global/' + ws_channel + '/';
+                if (ws_socket){
+                    ws_socket.close()
+                }
+                ws_socket = new WebSocket(connectionString);
+                ws_socket.onopen = ()=> {
+                    console.log(`Socket ${app} aberto: ${ws_channel}`)
+                };
+                ws_socket.onclose = (e)=> {
+                    if (debug) console.info(`Socket ${app} fechado: ${ws_channel}`, e)
+                    switch(e.code){
+                        case 1000: {
+                                // (brekado pelo front) "Normal closure, meaning that the purpose for which the connection was established has been fulfilled.";
+                                // quando, por exemplo,usuário sai de um componente para outro
+                                if (debug) console.info(`Frontend restarted`)
+                                break;
+                            }
+                        case 1001: break;// "An endpoint is \"going away\", such as a server going down or a browser having navigated away from a page.";
+                        case 1002: break;// "An endpoint is terminating the connection due to a protocol error";
+                        case 1003: break;// "An endpoint is terminating the connection because it has received a type of data it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary message).";
+                        case 1004: break;// "Reserved. The specific meaning might be defined in the future.";
+                        case 1005: break;// "No status code was actually present.";
+                        case 1006: {
+                                // (brekado pelo backend)"The connection was closed abnormally, e.g., without sending or receiving a Close control frame";
+                                // this.ws_connect();
+                                if (debug) console.info(`Backend restarted`)
+                                break;
+                            }
+                        case 1007: break;// "An endpoint is terminating the connection because it has received data within a message that was not consistent with the type of the message (e.g., non-UTF-8 [https://www.rfc-editor.org/rfc/rfc3629] data within a text message).";
+                        case 1008: break;// "An endpoint is terminating the connection because it has received a message that \"violates its policy\". This reason is given either if there is no other sutible reason, or if there is a need to hide specific details about the policy.";
+                        case 1009: break;// "An endpoint is terminating the connection because it has received a message that is too big for it to process.";
+                        case 1010: break;// "An endpoint (client) is terminating the connection because it has expected the server to negotiate one or more extension, but the server didn't return them in the response message of the WebSocket handshake. <br /> Specifically, the extensions that are needed are: " + event.reason;
+                        case 1011: break;// "A server is terminating the connection because it encountered an unexpected condition that prevented it from fulfilling the request.";
+                        case 1015: break;// "The connection was closed due to a failure to perform a TLS handshake (e.g., the server certificate can't be verified).";
+                        default: return  // "Unknown reason";
+                    }
+                };
+                ws_socket.onerror = (e) => {
+                    if (debug) console.info(`Socket ${app} with Error. `, e)
+                }
+                // Sending the info about the room
+                ws_socket.onmessage = (e) => {
+                    if (e === undefined) return
+                    // recuperando mensagem do servidor
+                    // retornar a mensagem recebida para a saída do componente WS
+                    let data = JSON.parse(e.data);
+                    data = data["payload"];
+                    // retornar do componente WS todo o payload e tratar fora deste conforme as regras de negócio
+                    // this.$emit("on-message", data);
+    
+                    if (data?.event === 'CALL-TICKET' && 
+                        data?.obj.id == '{{atendimento.id}}' && 
+                        data?.obj.sigla_senha === '{{atendimento.sigla_senha}}'){
+                        // atualizar a página quando for a senha chamada
+                        window.location.reload()
+                    }
+                }
+                if (ws_socket.readyState == WebSocket.OPEN) {
+                    ws_socket.onopen();
+                }
+            }
+            
+            initialize_ws()
+        }
+
+
+    </script>
+</body>
+</html>

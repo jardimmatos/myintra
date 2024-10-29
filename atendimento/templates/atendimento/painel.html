@@ -1,0 +1,753 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Atendimento</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
+    <style>
+        .senha-painel{
+            line-height: 1;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .historico-label{
+            font-size: 2vw;
+            font-weight: bold;
+        }
+        .prioridade-label{
+            font-size: 5vw;
+            font-weight: bold;
+        }
+        .senha-label{
+            font-size: 12vw;
+            margin: 8vh 0;
+            font-weight: bold;
+        }
+        .local-label{
+            font-size: 3vw;
+            font-weight: bold;
+        }
+        .atendente-label{
+            font-size: 3vw;
+            font-weight: bold;
+        }
+        .em-label{
+            font-size: 2vw;
+        }
+        .footer-label{
+            font-size: 30px;
+            font-weight: bold;
+        }
+        .item-historico{
+            width: 100%;
+            padding: 10px;
+        }
+        .item-historico-senha{
+            font-size: 3vw;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .item-historico-local{
+            font-size: 2vw;
+            font-weight: bold; 
+        }
+        .item-historico-prioridade{
+            font-size: 1.5vw;
+        }
+        .fab{
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            filter: opacity(.05);
+        }
+        .fab-hovering{
+            filter: opacity(1);
+        }
+        .nmp{
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .blink {
+          visibility: hidden;
+        }
+        .clock{
+            font-size: 2.5vw;
+            font-weight: bold;
+        }
+        .lista-historico-senhas{
+            overflow-y: auto;
+            height: 65vh;
+            width: 100%;
+        }
+        .footer-label {
+            font-size: 2.5vw;
+            align-self:center;
+        }
+        .footer-image{
+            max-width: 20vw;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="row" >
+            <div class="col-9">
+                <div class="row">
+                    <div class="col-12 text-center py-3" style="height:80vh;align-content:center"
+                        :style="'color:' + (chamada.prioridade == 'Prioridade' ? config.pageFontColorPriority : config.pageFontColorNormal)+ ';background:'+ (chamada.prioridade == 'Prioridade' ? config.pageBgColorPriority : config.pageBgColorNormal)">
+                        <div v-if="!config.unidade">
+                            <div style="background:yellow; color: red;">
+                                UNIDADE DE ATENDIMENTO NÃO PARAMETRIZADA
+                            </div>
+                        </div>
+                        <div class="senha-painel prioridade-label">[[chamada.prioridade]]</div>
+                        <div class="senha-painel senha-label" :class="{ blink: isBlinking }">[[chamada.sigla_senha]]</div>
+                        <div class="senha-painel local-label mb-6">[[chamada.local]]</div>
+                        <div class="senha-painel atendente-label mb-3">[[chamada.atendente]]</div>
+                        <div class="senha-painel em-label">chamada às [[chamada.em]]</div>
+                    </div>
+                    <div class="col-12"
+                        style="height:20vh;align-content: center;"
+                        :style="'background:'+ config.footerBgColor">
+                        <div class="row px-4">
+                            <img class="footer-image" v-if="config.img" :src="config.img"></img>
+                            <span class="footer-label" :style="'color:'+config.footerFontColor">
+                                [[config.footerLabel]]
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3" :style="'color:'+config.sidebarFontColor+';background:'+config.sidebarBgColor">
+                <div style="height:80vh">
+                    <div class="row">
+                        <div class="col-12 text-center historico-label py-2">
+                            HISTÓRICO
+                            <button type="button" title="Configurações"
+                                    class="btn btn-link" data-toggle="modal" data-target="#modalConfig">
+                                <i class="mdi mdi-dots-vertical text-white"></i>
+                            </button>
+                        </div>
+                        <div class="lista-historico-senhas">
+                            <div v-for="i in chamada.historico||[]" class="item-historico" :key="i">
+                                <div class="item-historico-senha">[[i.sigla_senha]]</div>
+                                <div class="row nmp item-historico">
+                                    <div class="item-historico-local w-50">[[i.local]]</div>
+                                    <div class="item-historico-prioridade w-50"
+                                        :style="'background:'+i.prioridade == 'Prioridade' ? config.pageBgColorPriority : config.pageBgColorNormal">
+                                        <span :style="'color:'+(i.prioridade == 'Prioridade' ? config.pageFontColorPriority : config.pageFontColorNormal)">
+                                            <b>[[i.prioridade]]</b>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 ma-0 pa-0 text-center">
+                        <div class="clock">
+                            <div class="date" v-if="showDate">
+                                <span :style="{ 'color': fontColor }">[[formattedDate]]</span>
+                            </div>
+                            <div class="time">
+                                <span class="hours" v-if="showHours" :style="{ 'color': fontColor }">
+                                    [[ hours ]]
+                                </span>
+                                <span class="separator" v-if="showMinutes" :style="{ 'color': fontColor }">:</span>
+                                <span class="minutes" v-if="showMinutes" :style="{ 'color': fontColor }">
+                                    [[ minutes ]]
+                                </span>
+                                <span class="separator" v-if="showSeconds" :style="{ 'color': fontColor }">:</span>
+                                <span class="seconds" v-if="showSeconds" :style="{ 'color': fontColor }">
+                                    [[ seconds ]]
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Configurações -->
+        <div class="modal fade" id="modalConfig" tabindex="-1" aria-labelledby="modalConfigLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalConfigLabel">Configurações de Painel</h5>
+                        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button> -->
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="formUnidade">Unidade de Atendimento</label>
+                                    <select class="form-control" id="formUnidade" v-model="config.unidade" @change="onChangeUnidade">
+                                        <option v-for="u in unidades" :value="u.id" :key="u.id">[[u.nome]]</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5>Som</h5>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="formSom">Clique para testar</label>
+                                    <div class="form-inline">
+                                        <input class="form-control" id="formSom" type="text" v-model="config.alert" readonly>
+                                        <button class="btn btn-primary mx-2" :disabled="!config.alert" @click="notificarSom"><i class="mdi mdi-play"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5>Senha Normal</h5>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="fundoSenhaNormal">Cor de fundo</label>
+                                    <select class="form-control" id="fundoSenhaNormal" v-model="config.pageBgColorNormal">
+                                        <option v-for="c in cores" :value="c.hexa" :key="c.hexa" :style="'background: '+c.hexa">
+                                            [[c.name]]
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="fonteSenhaNormal">Cor da fonte</label>
+                                    <select class="form-control" id="fonteSenhaNormal" v-model="config.pageFontColorNormal">
+                                        <option v-for="c in cores" :value="c.hexa" :key="c.hexa" :style="'background: '+c.hexa">
+                                            [[c.name]]
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5>Senha Prioridade</h5>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="fundoSenhaPrioridade">Cor de fundo</label>
+                                    <select class="form-control" id="fundoSenhaPrioridade" v-model="config.pageBgColorPriority">
+                                        <option v-for="c in cores" :value="c.hexa" :key="c.hexa" :style="'background: '+c.hexa">
+                                            [[c.name]]
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="fonteSenhaPrioridade">Cor da fonte</label>
+                                    <select class="form-control" id="fonteSenhaPrioridade" v-model="config.pageFontColorPriority">
+                                        <option v-for="c in cores" :value="c.hexa" :key="c.hexa" :style="'background: '+c.hexa">
+                                            [[c.name]]
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5>Histórico de Senhas</h5>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="fundoSenhaHistorico">Cor de fundo</label>
+                                    <select class="form-control" id="fundoSenhaHistorico" v-model="config.sidebarBgColor">
+                                        <option v-for="c in cores" :value="c.hexa" :key="c.hexa" :style="'background: '+c.hexa">
+                                            [[c.name]]
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="fonteSenhaHistorico">Cor da fonte</label>
+                                    <select class="form-control" id="fonteSenhaHistorico" v-model="config.sidebarFontColor">
+                                        <option v-for="c in cores" :value="c.hexa" :key="c.hexa" :style="'background: '+c.hexa">
+                                            [[c.name]]
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5>Rodapé</h5>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="fundoRodape">Cor de fundo</label>
+                                    <select class="form-control" id="fundoRodape" v-model="config.footerBgColor">
+                                        <option v-for="c in cores" :value="c.hexa" :key="c.hexa" :style="'background: '+c.hexa">
+                                            [[c.name]]
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="fonteRodape">Cor da fonte</label>
+                                    <select class="form-control" id="fonteRodape" v-model="config.footerFontColor">
+                                        <option v-for="c in cores" :value="c.hexa" :key="c.hexa" :style="'background: '+c.hexa">
+                                            [[c.name]]
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="textoRodape">Texto do Rodapé</label>
+                                    <input v-model="config.footerLabel" type="text" class="form-control" id="textoRodape" placeholder="Texto a exibir no rodapé">
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5>Imagem</h5>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="urlImagem">URL da imagem</label>
+                                    <input v-model="config.img" type="text" class="form-control" id="urlImagem" placeholder="URL da imagem...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5>Cache Histórico</h5>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" @click="limparHistorico" title="Limpar Histórico" class="btn btn-danger">
+                                    Limpar Histórico
+                                </button>
+                            </div>
+                        </div>
+
+                        <h5 class="pt-4">Websocket</h5>
+                        <div class="row">
+                            <div class="col-12">
+                                <label >[[ws_state(ws_socket)]]</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{% static 'intranet/atendimento/vue.js'%}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+    <script>
+    var app = new Vue({
+        delimiters: ['[[',']]'],
+        el: '#app',
+        created () {
+            moment.locale('pt_BR')
+            setInterval(() => { this.date = new Date() }, 1000)
+        },
+        props: {
+            showHours: {
+                type: Boolean,
+                default: true
+            },
+            showMinutes: {
+                type: Boolean,
+                default: true
+            },
+            showSeconds: {
+                type: Boolean,
+                default: true
+            },
+            showDate: {
+                type: Boolean,
+                default: true
+            },
+            dateFormat: {
+                type: String,
+                default: 'DD/MM/YYYY'
+            },
+            locale: {
+                type: String,
+                default: 'pt_BR'
+            },
+            fontColor: {
+                type: String,
+                default: '#ccc'
+            }
+        },
+        data:()=>({
+            date: new Date(),
+            debug: true,
+            ws_socket: null,
+            loading: false,
+            channel_painel_atendimento: 'channel',
+            isBlinking: false,
+            config:{
+                alert: 'ekiga-vm.wav',
+                footerLabel: '',
+                img: '',
+                unidade: null,
+                pageBgColorNormal: '#B22222',
+                pageFontColorNormal: '#F5F5F5',
+                pageBgColorPriority: '#FFFF00',
+                pageFontColorPriority: '#FF0000',
+                sidebarBgColor: '#8B0000',
+                sidebarFontColor: '#F5F5F5',
+                footerBgColor: '#8B0000',
+                footerFontColor: '#F5F5F5',
+                clockBgColor: '#BBBBBB',
+                clockFontColor: '#000000',
+            },
+            chamada:{},
+            unidades: [],
+        }),
+        methods: {
+            async GetUnidadesAtendimento(){
+                return await axios.get('/atendimento/api/v1/atendimento/list_unidades_atendimento/')
+            },
+            async init(){
+                this.load()
+                await this.listar_unidades()
+                this.ws_connect()
+            },
+            limparHistorico(){
+                localStorage.removeItem('chamada')
+                window.location.reload()
+            },
+            async listar_unidades(){
+                this.loading = true;
+                try{
+                    const unidades = await this.GetUnidadesAtendimento()
+                    this.unidades = unidades.data
+                }catch{
+                    alert('Falha ao carregar unidades!')
+                }
+                this.loading = false;
+            },
+            blinkText() {
+                let blinkCount = 0;
+                const maxBlinks = 3;
+                this.notificarSom()
+                const blinkInterval = setInterval(() => {
+                    this.isBlinking = !this.isBlinking;
+                    blinkCount++;
+                    
+                    // Para após 3 blinks (6 alterações de estado)
+                    if (blinkCount >= maxBlinks * 2) {
+                        clearInterval(blinkInterval);
+                        this.isBlinking = false;
+                    }
+                }, 500);
+            },
+            notificarSom(){
+                return new Promise((resolve, reject) => {
+                    var filename = this.config.alert || 'ekiga-vm.wav'
+
+                    const audio = new Audio()
+                    audio.src = `/static/intranet/atendimento/${filename}`
+                    audio.onended = resolve
+                    audio.onerror = reject
+                    audio.play()
+                })
+            },
+            onMessageWebSocket(value){
+                if(value?.event === 'CALL-TICKET'){
+                    this.chamada = value.obj
+                    this.chamada.em = moment().format('LTS');
+                    this.blinkText()
+                }
+            },
+            async load () {
+                this.chamada = JSON.parse(localStorage.getItem('chamada')) || {}
+                this.chamada.prioridade = this.chamada.prioridade || 'Normal';
+
+                this.config = JSON.parse(localStorage.getItem('config')) || this.config
+            },
+            onChangeUnidade(){
+                this.ws_connect()
+            },
+            openConfig(){
+                this.$refs.config_painel.dialog = true
+            },
+            initialize_ws(){
+                let url_ws = '';
+                if (this.debug){
+                    url_ws = 'localhost:8000';
+                }else{
+                    url_ws = 'meuservidor.dev.br';
+                }
+                const protocolo = (window.location.protocol == 'https:' ? 'wss://' : 'ws://');
+                const connectionString = protocolo + url_ws + '/ws/global/' + this.ws_channel + '/';
+                if (this.ws_socket){
+                    this.ws_socket.close();
+                }
+                this.ws_socket = new WebSocket(connectionString);
+            },
+            ws_connect(){
+                if (!this.config.unidade) return
+                setTimeout(()=>{
+                    this.initialize_ws();
+                    this.ws_socket.onopen = ()=> {
+                        if (this.debug) console.log(`Socket Painel aberto:`);
+                    };
+                    this.ws_socket.onclose = (e)=> {
+                        if (this.debug) console.info(`Socket Painel fechado:`, e)
+                        switch(e.code){
+                            case 1000: {
+                                    // (brekado pelo front) "Normal closure, meaning that the purpose for which the connection was established has been fulfilled.";
+                                    // quando, por exemplo,usuário sai de um componente para outro
+                                    if (this.debug) console.info(`Frontend restarted`)
+                                    break;
+                                }
+                            case 1001: break;// "An endpoint is \"going away\", such as a server going down or a browser having navigated away from a page.";
+                            case 1002: break;// "An endpoint is terminating the connection due to a protocol error";
+                            case 1003: break;// "An endpoint is terminating the connection because it has received a type of data it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary message).";
+                            case 1004: break;// "Reserved. The specific meaning might be defined in the future.";
+                            case 1005: break;// "No status code was actually present.";
+                            case 1006: {
+                                    // (brekado pelo backend)"The connection was closed abnormally, e.g., without sending or receiving a Close control frame";
+                                    //0 - CONNECTING, 1 - OPEN, 2 - CLOSING, 3 - CLOSED
+                                    this.ws_connect()
+                                    // this.ws_connect();
+                                    if (this.debug) console.info(`Backend stopped`)
+                                    break;
+                                }
+                            case 1007: break;// "An endpoint is terminating the connection because it has received data within a message that was not consistent with the type of the message (e.g., non-UTF-8 [https://www.rfc-editor.org/rfc/rfc3629] data within a text message).";
+                            case 1008: break;// "An endpoint is terminating the connection because it has received a message that \"violates its policy\". This reason is given either if there is no other sutible reason, or if there is a need to hide specific details about the policy.";
+                            case 1009: break;// "An endpoint is terminating the connection because it has received a message that is too big for it to process.";
+                            case 1010: break;// "An endpoint (client) is terminating the connection because it has expected the server to negotiate one or more extension, but the server didn't return them in the response message of the WebSocket handshake. <br /> Specifically, the extensions that are needed are: " + event.reason;
+                            case 1011: break;// "A server is terminating the connection because it encountered an unexpected condition that prevented it from fulfilling the request.";
+                            case 1015: break;// "The connection was closed due to a failure to perform a TLS handshake (e.g., the server certificate can't be verified).";
+                            default: return  // "Unknown reason";
+                        }
+                    };
+                    this.ws_socket.onerror = (e) => {
+                        if (this.debug) console.info(`Socket Painel with Error. `, e)
+                    }
+                    // Sending the info about the room
+                    this.ws_socket.onmessage = (e) => {
+                        if (e === undefined) return
+                        // recuperando mensagem do servidor
+                        // retornar a mensagem recebida para a saída do componente WS
+                        let data = JSON.parse(e.data);
+                        data = data["payload"];
+                        // retornar do componente WS todo o payload e tratar fora deste conforme as regras de negócio
+                        this.onMessageWebSocket(data)
+                    }
+                    if (this.ws_socket.readyState == WebSocket.OPEN) {
+                        this.ws_socket.onopen();
+                    }
+                }, 5000)
+            },
+            ws_state(ws_socket){
+                switch(ws_socket?.readyState){
+                    case 0: return `Estabelecendo conexão com websocket ⌛...`;
+                    case 1: return `Conectado ✅`;
+                    case 2: return `Fechando conexão com websocket 🕐`;
+                    case 3: return `Conexão com websocket foi encerrada ❌`;
+                    default: return `...`;
+                }
+            }
+        },
+        mounted(){
+            this.init()
+        },
+        computed: {
+            cores(){
+                return [
+                    { name: 'Black', hexa: '#000000' },
+                    { name: 'grey11', hexa: '#1C1C1C' },
+                    { name: 'grey21', hexa: '#363636' },
+                    { name: 'grey31', hexa: '#4F4F4F' },
+                    { name: 'DimGray', hexa: '#696969' },
+                    { name: 'Gray', hexa: '#808080' },
+                    { name: 'DarkGray', hexa: '#A9A9A9' },
+                    { name: 'Silver', hexa: '#C0C0C0' },
+                    { name: 'LightGrey', hexa: '#D3D3D3' },
+                    { name: 'Gainsboro', hexa: '#DCDCDC' },
+                    { name: 'SlateBlue', hexa: '#6A5ACD' },
+                    { name: 'SlateBlue1', hexa: '#836FFF' },
+                    { name: 'SlateBlue3', hexa: '#6959CD' },
+                    { name: 'DarkSlateBlue', hexa: '#483D8B' },
+                    { name: 'MidnightBlue', hexa: '#191970' },
+                    { name: 'Navy', hexa: '#000080' },
+                    { name: 'DarkBlue', hexa: '#00008B' },
+                    { name: 'MediumBlue', hexa: '#0000CD' },
+                    { name: 'Blue', hexa: '#0000FF' },
+                    { name: 'CornflowerBlue', hexa: '#6495ED' },
+                    { name: 'RoyalBlue', hexa: '#4169E1' },
+                    { name: 'DodgerBlue', hexa: '#1E90FF' },
+                    { name: 'DeepSkyBlue', hexa: '#00BFFF' },
+                    { name: 'LightSkyBlue', hexa: '#87CEFA' },
+                    { name: 'SkyBlue', hexa: '#87CEEB' },
+                    { name: 'LightBlue', hexa: '#ADD8E6' },
+                    { name: 'SteelBlue', hexa: '#4682B4' },
+                    { name: 'LightSteelBlue', hexa: '#B0C4DE' },
+                    { name: 'SlateGray', hexa: '#708090' },
+                    { name: 'LightSlateGray', hexa: '#778899' },
+                    { name: 'Aqua', hexa: '#00FFFF' },
+                    { name: 'DarkTurquoise', hexa: '#00CED1' },
+                    { name: 'Turquoise', hexa: '#40E0D0' },
+                    { name: 'MediumTurquoise', hexa: '#48D1CC' },
+                    { name: 'LightSeaGreen', hexa: '#20B2AA' },
+                    { name: 'DarkCyan', hexa: '#008B8B' },
+                    { name: 'Teal', hexa: '#008080' },
+                    { name: 'Aquamarine', hexa: '#7FFFD4' },
+                    { name: 'MediumAquamarine', hexa: '#66CDAA' },
+                    { name: 'CadetBlue', hexa: '#5F9EA0' },
+                    { name: 'DarkSlateGray', hexa: '#2F4F4F' },
+                    { name: 'MediumSpringGreen', hexa: '#00FA9A' },
+                    { name: 'SpringGreen', hexa: '#00FF7F' },
+                    { name: 'PaleGreen', hexa: '#98FB98' },
+                    { name: 'LightGreen', hexa: '#90EE90' },
+                    { name: 'DarkSeaGreen', hexa: '#8FBC8F' },
+                    { name: 'MediumSeaGreen', hexa: '#3CB371' },
+                    { name: 'SeaGreen', hexa: '#2E8B57' },
+                    { name: 'DarkGreen', hexa: '#006400' },
+                    { name: 'Green', hexa: '#008000' },
+                    { name: 'ForestGreen', hexa: '#228B22' },
+                    { name: 'LimeGreen', hexa: '#32CD32' },
+                    { name: 'Lime', hexa: '#00FF00' },
+                    { name: 'LawnGreen', hexa: '#7CFC00' },
+                    { name: 'Chartreuse', hexa: '#7FFF00' },
+                    { name: 'GreenYellow', hexa: '#ADFF2F' },
+                    { name: 'YellowGreen', hexa: '#9ACD32' },
+                    { name: 'OliveDrab', hexa: '#6B8E23' },
+                    { name: 'DarkOliveGreen', hexa: '#556B2F' },
+                    { name: 'Olive', hexa: '#808000' },
+                    { name: 'DarkKhaki', hexa: '#BDB76B' },
+                    { name: 'Goldenrod', hexa: '#DAA520' },
+                    { name: 'DarkGoldenrod', hexa: '#B8860B' },
+                    { name: 'SaddleBrown', hexa: '#8B4513' },
+                    { name: 'Sienna', hexa: '#A0522D' },
+                    { name: 'RosyBrown', hexa: '#BC8F8F' },
+                    { name: 'Peru', hexa: '#CD853F' },
+                    { name: 'Chocolate', hexa: '#D2691E' },
+                    { name: 'SandyBrown', hexa: '#F4A460' },
+                    { name: 'NavajoWhite', hexa: '#FFDEAD' },
+                    { name: 'Wheat', hexa: '#F5DEB3' },
+                    { name: 'BurlyWood', hexa: '#DEB887' },
+                    { name: 'Tan', hexa: '#D2B48C' },
+                    { name: 'MediumSlateBlue', hexa: '#7B68EE' },
+                    { name: 'MediumPurple', hexa: '#9370DB' },
+                    { name: 'BlueViolet', hexa: '#8A2BE2' },
+                    { name: 'Indigo', hexa: '#4B0082' },
+                    { name: 'DarkViolet', hexa: '#9400D3' },
+                    { name: 'DarkOrchid', hexa: '#9932CC' },
+                    { name: 'MediumOrchid', hexa: '#BA55D3' },
+                    { name: 'Purple', hexa: '#A020F0' },
+                    { name: 'DarkMagenta', hexa: '#8B008B' },
+                    { name: 'Fuchsia', hexa: '#FF00FF' },
+                    { name: 'Violet', hexa: '#EE82EE' },
+                    { name: 'Orchid', hexa: '#DA70D6' },
+                    { name: 'Plum', hexa: '#DDA0DD' },
+                    { name: 'MediumVioletRed', hexa: '#C71585' },
+                    { name: 'DeepPink', hexa: '#FF1493' },
+                    { name: 'HotPink', hexa: '#FF69B4' },
+                    { name: 'PaleVioletRed', hexa: '#DB7093' },
+                    { name: 'LightPink', hexa: '#FFB6C1' },
+                    { name: 'Pink', hexa: '#FFC0CB' },
+                    { name: 'LightCoral', hexa: '#F08080' },
+                    { name: 'IndianRed', hexa: '#CD5C5C' },
+                    { name: 'Crimson', hexa: '#DC143C' },
+                    { name: 'Maroon', hexa: '#800000' },
+                    { name: 'DarkRed', hexa: '#8B0000' },
+                    { name: 'FireBrick', hexa: '#B22222' },
+                    { name: 'Brown', hexa: '#A52A2A' },
+                    { name: 'Salmon', hexa: '#FA8072' },
+                    { name: 'DarkSalmon', hexa: '#E9967A' },
+                    { name: 'LightSalmon', hexa: '#FFA07A' },
+                    { name: 'Coral', hexa: '#FF7F50' },
+                    { name: 'Tomato', hexa: '#FF6347' },
+                    { name: 'Red', hexa: '#FF0000' },
+                    { name: 'OrangeRed', hexa: '#FF4500' },
+                    { name: 'DarkOrange', hexa: '#FF8C00' },
+                    { name: 'Orange', hexa: '#FFA500' },
+                    { name: 'Gold', hexa: '#FFD700' },
+                    { name: 'Yellow', hexa: '#FFFF00' },
+                    { name: 'Khaki', hexa: '#F0E68C' },
+                    { name: 'AliceBlue', hexa: '#F0F8FF' },
+                    { name: 'GhostWhite', hexa: '#F8F8FF' },
+                    { name: 'Snow', hexa: '#FFFAFA' },
+                    { name: 'Seashell', hexa: '#FFF5EE' },
+                    { name: 'FloralWhite', hexa: '#FFFAF0' },
+                    { name: 'WhiteSmoke', hexa: '#F5F5F5' },
+                    { name: 'Beige', hexa: '#F5F5DC' },
+                    { name: 'OldLace', hexa: '#FDF5E6' },
+                    { name: 'Ivory', hexa: '#FFFFF0' },
+                    { name: 'Linen', hexa: '#FAF0E6' },
+                    { name: 'Cornsilk', hexa: '#FFF8DC' },
+                    { name: 'AntiqueWhite', hexa: '#FAEBD7' },
+                    { name: 'BlanchedAlmond', hexa: '#FFEBCD' },
+                    { name: 'Bisque', hexa: '#FFE4C4' },
+                    { name: 'LightYellow', hexa: '#FFFFE0' },
+                    { name: 'LemonChiffon', hexa: '#FFFACD' },
+                    { name: 'LightGoldenrodYellow', hexa: '#FAFAD2' },
+                    { name: 'PapayaWhip', hexa: '#FFEFD5' },
+                    { name: 'PeachPuff', hexa: '#FFDAB9' },
+                    { name: 'Moccasin', hexa: '#FFE4B5' },
+                    { name: 'PaleGoldenrod', hexa: '#EEE8AA' },
+                    { name: 'MistyRose', hexa: '#FFE4E1' },
+                    { name: 'LavenderBlush', hexa: '#FFF0F5' },
+                    { name: 'Lavender', hexa: '#E6E6FA' },
+                    { name: 'Thistle', hexa: '#D8BFD8' },
+                    { name: 'Azure', hexa: '#F0FFFF' },
+                    { name: 'LightCyan', hexa: '#E0FFFF' },
+                    { name: 'PowderBlue', hexa: '#B0E0E6' },
+                    { name: 'PaleTurquoise', hexa: '#E0FFFF' },
+                    { name: 'Honeydew', hexa: '#F0FFF0' },
+                    { name: 'MintCream', hexa: '#F5FFFA' },
+
+                ]
+            },
+            unidade_selecionada(){
+                const uni = this.config.unidade
+                return uni
+            },
+            ws_channel(){
+                return `channel_painel_atendimento_${this.config.unidade}`
+            },
+            hours () {
+                return moment(this.date).format('HH')
+            },
+            minutes () {
+                return moment(this.date).format('mm')
+            },
+            seconds () {
+                return moment(this.date).format('ss')
+            },
+            formattedDate () {
+                return moment(this.date).format(this.dateFormat)
+            }
+        },
+        watch: {
+            config: {
+                handler(value){
+                    localStorage.setItem('config',JSON.stringify(value))
+                }, deep: true
+            },
+            chamada: {
+                handler(value){
+                    localStorage.setItem('chamada',JSON.stringify(value))
+                }, deep: true
+            },
+        }
+    })
+    </script>
+    
+</body>
+</html>
