@@ -77,10 +77,19 @@ docker-compose up -d myintradb
 - Documentações e Tutoriais em formatação HTML
 
 ##### Adds ambiente Linux
-Instalar locale pt_BR.utf8
-Comando ```locale``` pra listar o locale atual
-Comando ```locale -a``` pra listar os disponíveis
-Se não existir o locale pt_BR, instalar: ```locale-gen pt_BR.UTF-8```
-Reconfigurar após o pacote estar instalado: ```dpkg-reconfigure locales````
-Atualizar locale padrão: ```update-locale LANG=pt_BR.UTF-8```
-Consultar o valor definido em LANG: ```cat /etc/default/locale```
+- Instalar locale pt_BR.utf8
+- Comando ```locale``` pra listar o locale atual
+- Comando ```locale -a``` pra listar os disponíveis
+- Se não existir o locale pt_BR, instalar: ```locale-gen pt_BR.UTF-8```
+- Reconfigurar após o pacote estar instalado:
+```
+dpkg-reconfigure locales
+```
+- Atualizar locale padrão:
+```
+update-locale LANG=pt_BR.UTF-8
+```
+- Consultar o valor definido em LANG:
+```
+cat /etc/default/locale
+```
