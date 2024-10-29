@@ -1,0 +1,173 @@
+
+/*----------------------------------------------------------------------*/
+.toast-message, .toast-title{
+    font-family: 'Roboto', sans-serif;
+    font-size:13px;
+}
+.toast-title{
+    margin-bottom: 5px ;
+}
+
+.toast.toast-warning {
+background-color: #F89406 !important;
+}
+.toast.toast-error {
+background-color: #BD362F !important;
+}
+.toast.toast-success {
+background-color: #51A351 !important;
+}
+.toast.toast-info {
+background-color: #2F96B4 !important;
+}
+input[type="text"], input[type="password"], input[type="number"], textarea {
+    font-weight: 500 !important;
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(.5) !important;
+}
+
+* {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
+}
+
+/* CUSTOM TABLE */
+.custom-header-style.v-table > .v-table__wrapper > table > thead > tr > th:hover,
+.custom-header-style.v-table > .v-table__wrapper > table > thead > tr > th.v-data-table__th--sortable:hover
+{
+    color: #aaa;
+    transition: .3s;
+}
+.custom-header-style.v-table > .v-table__wrapper > table > thead > tr {
+    background-color: rgb(var(--v-theme-primary));
+    /* cor da fonte do header da tabela */
+    color: white;
+    font-size: 15px;
+}
+
+/* CUSTOM TABLE CHILD (EXPANDED ROW IN A TABLE)*/
+.custom-header-style-child.v-table > .v-table__wrapper > table > thead > tr > th:hover,
+.custom-header-style-child.v-table > .v-table__wrapper > table > thead > tr > th.v-data-table__th--sortable:hover
+{
+    color: #ccc;
+}
+.custom-header-style-child.v-table > .v-table__wrapper > table > thead > tr {
+    background-color: rgb(var(--v-theme-primary-lighten-1));
+    color: rgb(var(--v-theme-primary));
+}
+.boleto{
+    font-family: monospace !important;
+}
+
+.v-switch--inset .v-switch__track{
+    height: 26px !important;
+    min-width: 47px !important;
+}
+.lista-filtro-espacos .v-list-group__items .v-list-item {
+    padding-inline-start: 15px !important;
+}
+
+/* CUSTOMIZACOES DO VUE CAL */
+.vuecal__bg {
+    padding: 5px !important;
+}
+.vuecal--custom-theme .weekday-label {
+    /** Tamanho da fonte do header e title */
+    font-size: 12px;
+}
+.vuecal--custom-theme .vuecal__menu, .vuecal--custom-theme .vuecal__title {
+    /** Tamanho da fonte do header e title */
+    font-size: 12px;
+}
+.vuecal--custom-theme .vuecal__menu {
+    /** navigation types */
+    /* seletor de views do header */
+    background-color: rgb(var(--v-theme-primary)) !important;
+    color: rgb(var(--v-theme-on-primary)) !important;
+    /* border-radius: 5px 5px 0 0; */
+}
+.vuecal--custom-theme .vuecal__cell-events-count {
+    /** navigation types */
+    display: none !important; /* Não exibir a contagem devido à limitação de carregamento de reservas por dia*/
+}
+.vuecal__title-bar {
+    /** fonts e fundo dos elementos no header bar */
+    /** header bar */
+    background-color: rgb(var(--v-theme-primary)) !important;
+    color: rgb(var(--v-theme-on-primary)) !important;
+}
+.vuecal__cell-content {
+    /** padrao - cor das células futuras */
+    background-color: rgb(var(--v-theme-primary-lighten-1)) !important;
+    color: rgb(var(--v-theme-primary)) !important;
+    font-weight: bold !important;
+    border-color: rgb(var(--v-theme-primary)) !important;
+}
+.vuecal__cell--today .vuecal__cell-content {
+    /** present day */
+    background-color: rgb(var(--v-theme-primary)) !important;
+    color: rgb(var(--v-theme-on-primary)) !important;
+}
+.vuecal--rounded-theme.vuecal--day-view .vuecal__cell-content {
+    /** borda do elemento no topo do dia */
+    background-color: transparent !important;
+    border-width: 0px !important;
+}
+.vuecal__cell--selected .vuecal__cell-content {
+    /** borda do elemento selecionado */
+    border-color: rgb(var(--v-theme-primary)) !important;
+    border-width: 2px !important;
+}
+.vuecal__cell--disabled {
+    /** texto apenas do elemento "linhado"(texto-cortado) */
+    color: rgb(96, 93, 93) !important;
+}
+.vuecal__cell--disabled .vuecal__cell-content{
+    /** fundo do elemento disabled */
+    background-color: rgb(var(--surface-variant)) !important;
+    border-color: transparent !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    color: #777 !important;
+}
+.vuecal__flex .weekday-label{
+    /* cor das labels na parte superior acima dos dias */
+    color: rgb(var(--v-theme-on-surface-variant)) !important;
+    background-color: rgb(var(--v-theme-surface-variant)) !important;
+}
+.vuecal__now-line {
+    /* cor da linha que representa o horário atual */
+    color: rgb(var(--surface-variant)) !important;
+}
+/* Different color for different event types. */
+.vuecal__event {
+    /* cor do corpo do evento */
+    background-color: rgb(var(--v-theme-primary-darken-1)) !important;
+    border: 1px solid #ddd !important;
+    color: #fff !important;
+}
+.vuecal__no-event {
+    font-size: 10px;
+}
+.year-view{
+    padding: 1px !important;
+}
+.vuecal--custom-theme:not(.vuecal--day-view) .vuecal__cell--selected {
+    /* área do ícone dia do mês do calendário*/
+    background-color: rgb(var(--v-theme-surface)) !important;
+    border-radius: 3px;
+}
+.cal-nav-icons:hover{
+    color: #ddd !important;
+    transition: .1s;
+}
+/* week view */
+.vuecal__cells.week-view .vuecal__cell::before{
+    border: 1px solid  !important;
+    padding: 2px;
+}

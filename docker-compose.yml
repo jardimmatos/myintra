@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  myintradb:
+    container_name: myintradb
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 'myintra_pwd!'
+      MYSQL_USER: 'myintra'
+      MYSQL_DATABASE: myintra
+      MYSQL_PASSWORD: 'myintra_pwd!'
+    ports:
+      - 3326:3306
+    volumes:
+      - db_volume:/var/lib/mysql
+  
+volumes:
+  db_volume:
