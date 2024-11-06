@@ -114,7 +114,7 @@ const actions = {
             ])
             created = true
         }catch(error){
-            console.log('lancando error em CreateReserva Store', error)
+            console.error('lancando error em CreateReserva Store', error)
             commit("setAlerts", [ error.toast_message ])
         }
         commit('setReservaCreateLoading', false)

@@ -3,7 +3,7 @@ from django.contrib import admin
 from . import models
 from import_export import admin as import_export_admin, fields as import_export_fields, resources
 
-admin.site.site_header = 'Administração'
+admin.site.site_header = 'My Intranet'
 admin.site.index_title = 'Configurações'
 admin.site.site_title = 'Gestão do Sistema'
 admin.site.login_template = 'admin/login.html'
