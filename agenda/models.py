@@ -290,7 +290,7 @@ class Reserva(TimeStampedModel):
         # ATIVO/INATIVO
         if not self.espaco.ativo:
             # self.delete_attachments()
-            raise ValidationError({'espaco': _('Espaço inativo no momento!')})
+            raise ValidationError({'espaco': 'Espaço inativo no momento!'})
         
         config = self.validate_configuracao()
         is_super = self.validate_superusers()
@@ -336,32 +336,32 @@ class Reserva(TimeStampedModel):
         # VALIDA SE ESPACO FOI INFORMADO
         if not self.espaco:
             # self.delete_attachments()
-            raise ValidationError({'espaco': _('Espaço não informado!')})
+            raise ValidationError({'espaco': 'Espaço não informado!'})
         
         # VALIDA SE RESPONSAVEL FOI INFORMADO
         if not self.responsavel:
             # self.delete_attachments()
-            raise ValidationError({'responsavel': _('Nenhum responsável informado!')})
+            raise ValidationError({'responsavel': 'Nenhum responsável informado!'})
 
         # VALIDA SE FINALIDADE FOI INFORMADA
         if not self.finalidade:
             # self.delete_attachments()
-            raise ValidationError({'finalidade': _('Finalidade não informada!')})
+            raise ValidationError({'finalidade': 'Finalidade não informada!'})
 
         # VALIDA SE DATA FOI INFORMADA
         if not self.date:
             # self.delete_attachments()
-            raise ValidationError({'date': _('Data não informada!')})
+            raise ValidationError({'date': 'Data não informada!'})
 
         # VALIDA SE HORA INICIO FOI INFORMADA
         if not self.start:
             # self.delete_attachments()
-            raise ValidationError({'start': _('Horário inicial não informado!')})
+            raise ValidationError({'start': 'Horário inicial não informado!'})
 
         # VALIDA SE HORA FIM FOI INFORMADA
         if not self.end:
             # self.delete_attachments()
-            raise ValidationError({'end': _('Horário final não informado!')})
+            raise ValidationError({'end': 'Horário final não informado!'})
 
     def validate_regras(self, start_reserva, end_reserva):
         config = self.validate_configuracao()
@@ -428,12 +428,12 @@ class Reserva(TimeStampedModel):
         # MAX DURATION PARAM
         if end_reserva > (start_reserva + timedelta(minutes=self.espaco.max_duracao)):
             # self.delete_attachments()
-            raise ValidationError({'end': _('Duração máxima permitida é de %s!') % self.minutesToHour(self.espaco.max_duracao) })
+            raise ValidationError({'end': 'Duração máxima permitida é de %s!' % self.minutesToHour(self.espaco.max_duracao) })
     
         # MIN DURATION PARAM
         if end_reserva < (start_reserva + timedelta(minutes=self.espaco.min_duracao)):
             # self.delete_attachments()
-            raise ValidationError({'end': _('Duração mínima permitida é de, pelo menos, %s!') % self.minutesToHour(self.espaco.min_duracao) })
+            raise ValidationError({'end': 'Duração mínima permitida é de, pelo menos, %s!' % self.minutesToHour(self.espaco.min_duracao) })
 
     def validate_configuracao(self):
         config = Configuracao.objects.first()
@@ -484,7 +484,7 @@ class Reserva(TimeStampedModel):
             min_date_allowed = self.calcula_horas_uteis()
             if start_reserva < min_date_allowed:
                 # self.delete_attachments()
-                raise ValidationError({'date': _('Data e horário não podem ser inferior a %s horas úteis. Data mínima prevista: %s') % (self.espaco.min_criacao, min_date_allowed.strftime(FormatDateStringsEnum.DEFAULT_BR_FORMAT_DATETIME.value) )})
+                raise ValidationError({'date': 'Data e horário não podem ser inferior a %s horas úteis. Data mínima prevista: %s' % (self.espaco.min_criacao, min_date_allowed.strftime(FormatDateStringsEnum.DEFAULT_BR_FORMAT_DATETIME.value) )})
     
     def validate_reservar_sabado_domingo(self, st):
         # Permite Gestores "burlar"esta regra""
@@ -493,11 +493,11 @@ class Reserva(TimeStampedModel):
 
         if not self.espaco.permite_reservar_sabado:
             if st.weekday() in [DayOfWeekIndexEnum.SAT.value]:
-                raise ValidationError({'date': _('Espaço não habilitado para reservar em dias de Sábado')})
+                raise ValidationError({'date': 'Espaço não habilitado para reservar em dias de Sábado'})
         
         if not self.espaco.permite_reservar_domingo:
             if st.weekday() in [DayOfWeekIndexEnum.SUN.value]:
-                raise ValidationError({'date': _('Espaço não habilitado para reservar em dias de Domingo')})
+                raise ValidationError({'date': 'Espaço não habilitado para reservar em dias de Domingo'})
 
     def inicializa_status(self):
         # Status inicial para requer_aprovacao, quando habilitado
