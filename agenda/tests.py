@@ -65,7 +65,7 @@ class AgendamentoTestCase(TestCase):
         self.espaco.regras.set([self.regra])
         self.espaco.gestores.set([self.gestor])
 
-        to_date = datetime.datetime(2024,11,7)
+        to_date = datetime.datetime(2024,11,16)
         start_time=datetime.time(19,0,0)
         end_time=datetime.time(22,0,0)
 
@@ -82,7 +82,7 @@ class AgendamentoTestCase(TestCase):
     # Testes Unitários
 
     def test_metodo_clean(self):
-        to_date = datetime.datetime(2024,11,8)
+        to_date = datetime.datetime(2024,11,15)
         start_time=datetime.time(19,0,0)
         end_time=datetime.time(22,0,0)
         agenda = models_agenda.Reserva()
@@ -95,4 +95,22 @@ class AgendamentoTestCase(TestCase):
         agenda.titulo='Titulo'
         agenda.participantes=0
         self.assertRaises(ValidationError, agenda.clean() )
+
+    def test_metodo_finalidade_object(self):
+        self.assertEqual(self.agendamento.finalidade_object(), self.finalidade )
+
+    def test_metodo_espaco_object(self):
+        self.assertEqual(self.agendamento.espaco_object(), self.espaco )
+
+    def test_metodo_get_status(self):
+        self.assertEqual(self.agendamento.status_reserva, StatusReservaEnum.OPENED.name )
+
+    def test_metodo_get_mail_gestores(self):
+        self.assertEqual(len(self.agendamento.get_mail_gestores()), 1 )
+
+    def test_metodo_valida_parametros_espaco(self):
+        self.assertRaises(ValidationError, self.agendamento.validate_parametros_espaco() )
+
+    def test_metodo_valida_campos_obrigatorios(self):
+        self.assertRaises(ValidationError, self.agendamento.validate_campos_obrigatorios() )
 
