@@ -1,16 +1,14 @@
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
-from django.utils.translation import gettext as _
-from django.http import JsonResponse
 
 # class RegisterRequest(BasePermission):
 #     def has_permission(self, request, view):
 #         return False
-        
+
 
 class IsAdminUser(BasePermission):
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_staff)
-        
+
 
 class IsSuperUser(BasePermission):
     def has_permission(self, request, view):

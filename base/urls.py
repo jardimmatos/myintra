@@ -4,7 +4,7 @@ from . import views
 app_name = 'base'
 
 urlpatterns = [
-    
+
     path('', views.Index.as_view(), name="index"),
 
     path('base/api/v1/', include('base.api_urls')),

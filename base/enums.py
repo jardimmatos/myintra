@@ -17,7 +17,7 @@ class DayOfWeekIndexEnum(Enum):
     THU = 3
     FRI = 4
     SAT = 5
-    SUN = 6 
+    SUN = 6
 
 
 class DayOfWeekNameEnum(Enum):
@@ -56,9 +56,9 @@ class ActionEnum(Enum):
 
 class AppEnum(Enum):
     """ Para uso em logs e especificação de APP """
-    BASE = 'Base' 
-    AGENDALABS = 'AgendaLabs' 
-    COFRE = 'Cofre' 
+    BASE = 'Base'
+    AGENDALABS = 'AgendaLabs'
+    COFRE = 'Cofre'
     NOTIFICATIONS = 'Notificações'
     RECURSOS_ATIVOS = 'Recursos'
     REPO_BI = 'Repositórios BI'

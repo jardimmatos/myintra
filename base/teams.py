@@ -3,9 +3,10 @@ import requests
 
 from base.utils import split_list
 
+
 class TeamsTemplates:
     TEMPLATE_SIMPLES = 0
-    TEMPLATE_HTML = 1 # este padrao não aceita imagens no corpo HTML
+    TEMPLATE_HTML = 1  # este padrao não aceita imagens no corpo HTML
     TEMPLATE_FACTS = 2
 
     def __init__(self, options={}):
@@ -17,7 +18,6 @@ class TeamsTemplates:
         self.url_image = options.get('url_image', None)
         self.color = options.get('color', 'd70076')
 
-    
     def template_simples_imagem(self):
         items = []
         # Card Templates
@@ -27,14 +27,14 @@ class TeamsTemplates:
         items.append({
             "type": "TextBlock",
             "text": self.title,
-            "size":"medium",
+            "size": "medium",
             "style": "heading"
         })
 
         # Imagem
-        if self.url_image: 
-            items.append({ "type": "Image", "url": self.url_image })
-        
+        if self.url_image:
+            items.append({"type": "Image", "url": self.url_image})
+
         # MENSAGEM
         for m in self.messages:
             items.append({
@@ -46,7 +46,7 @@ class TeamsTemplates:
         items.append({
             "type": "TextBlock",
             "text": self.subtitle,
-            "size":"small",
+            "size": "small",
             "style": "heading",
             "isSubtle": True
         })
@@ -57,28 +57,30 @@ class TeamsTemplates:
         #     "actions": [
         #         {
         #             "type": "Action.OpenUrl",
-        #             "title": "Intranet",
-        #             "tooltip": "Acessar Intranet",
+        #             "title": "My Intranet",
+        #             "tooltip": "Acessar My Intranet",
         #             "url": "https://meuservidor.dev.br"
         #         }
         #     ]
         # })
         # {
         #     "type": "TextBlock",
-        #     "text": "For Samples and Templates, see [https://adaptivecards.io/samples](https://adaptivecards.io/samples)"
+        #     "text": "For Samples and Templates, \
+        # see https://adaptivecards.io/samples"
         # },
 
         payload = {
-            "type":"message",
-            "attachments":[
+            "type": "message",
+            "attachments": [
                 {
-                    "contentType":"application/vnd.microsoft.card.adaptive",
-                    "contentUrl":None,
-                    "content":{
-                        "$schema":"http://adaptivecards.io/schemas/adaptive-card.json",
-                        "type":"AdaptiveCard",
-                        "version":"1.2",
-                        "body":items
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "contentUrl": None,
+                    "content": {
+                        "$schema":
+                        "http://adaptivecards.io/schemas/adaptive-card.json",
+                        "type": "AdaptiveCard",
+                        "version": "1.2",
+                        "body": items
                     }
                 }
             ]
@@ -88,16 +90,17 @@ class TeamsTemplates:
 
     def template_html(self):
         payload = {
-            "type":"message",
-            "attachments":[
+            "type": "message",
+            "attachments": [
                 {
-                    "contentType": "application/vnd.microsoft.teams.card.o365connector",
+                    "contentType":
+                    "application/vnd.microsoft.teams.card.o365connector",
                     "content": {
                         "@type": "MessageCard",
                         "@context": "https://schema.org/extensions",
                         "summary": "Summary",
                         "title": self.title,
-                        "sections": [ { "text": m } for m in self.messages ]
+                        "sections": [{"text": m} for m in self.messages]
                     }
                 }
             ]
@@ -115,20 +118,23 @@ class TeamsTemplates:
                 "activityTitle": self.title,
                 "activitySubtitle": self.subtitle,
                 "activityImage": "https://i.imgur.com/IWRNYlR.png",
-                "facts": [{ "name": m[0], "value": m[1] } for m in self.messages],
+                "facts": [
+                    {
+                        "name": m[0],
+                        "value": m[1]
+                    } for m in self.messages],
                 "markdown": True
             }],
         }
-           
+
         # self.send(payload)
         return payload
-
 
     def send(self):
         try:
             if self.template == self.TEMPLATE_HTML:
                 payload = self.template_html()
-            
+
             elif self.template == self.TEMPLATE_FACTS:
                 payload = self.template_facts()
 
@@ -136,17 +142,17 @@ class TeamsTemplates:
                 payload = self.template_simples_imagem()
 
             payload = json.dumps(payload)
-            response = requests.post(self.channel, payload)
+            requests.post(self.channel, payload)
             # print(response.__dict__)
         except Exception as ex:
             print('Exception on send TeamsTemplates: ', str(ex))
 
 
-        
-
 def format_message(message):
-    # print('message teams', message)
-    ''' message deve conter um dict com as keys SERVER, LOGS e descricao da integração (INTEGRACAO) '''
+    """
+        message deve conter um dict com as keys SERVER, LOGS e
+        descricao da integração (INTEGRACAO)
+    """
     content_body = []
     header_body = {
         "type": "ColumnSet",
@@ -184,35 +190,37 @@ def format_message(message):
         ]
     }
     content_body.append(header_body)
-    for l in message.get('LOGS'):
-        content_body.append( { "type": "TextBlock", "text": str(l) } )
+    for log in message.get('LOGS'):
+        content_body.append({"type": "TextBlock", "text": str(log)})
 
-    default_payload = { 
+    default_payload = {
         "msteams": {
             "width": "Full"
         },
-        "$schema": "http://adaptivecards.io/schemas/1.2.0/adaptive-card.json", 
-        "type": "AdaptiveCard", 
-        "version": "1.0" 
+        "$schema": "http://adaptivecards.io/schemas/1.2.0/adaptive-card.json",
+        "type": "AdaptiveCard",
+        "version": "1.0"
     }
     default_payload['body'] = content_body
 
-    full_body =  {
-    "type":"message",
-    "attachments":[
-       {
-          "contentType":"application/vnd.microsoft.card.adaptive",
-          "contentUrl":None,
-          "content":default_payload
-       }
-    ]
-     }
+    full_body = {
+        "type": "message",
+        "attachments": [
+            {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": None,
+                "content": default_payload
+            }]
+        }
     return full_body
 
+
 def send_to_teams(channel, message):
-    if not channel: return
+    if not channel:
+        return None
     url = channel
-    # quebrar os logs em grupos de logs limitados a 20 logs por mensagem no teams
+    # quebrar os logs em grupos de logs limitados a 20 logs
+    # por mensagem no teams
     splited_logs_msgs = split_list(20, message.get('LOGS'))
     for msgs in splited_logs_msgs:
         message['LOGS'] = msgs
@@ -231,8 +239,8 @@ def send_to_teams_channel(options):
         subtitle = options.get('subtitle', 'Intranet')
         message = options.get('message', [])
         url_image = options.get('url_image', None)
-        if not channel: return
-        if len(message) == 0: return
+        if not channel or not len(message):
+            return
 
         items = []
         # Card Templates
@@ -242,15 +250,15 @@ def send_to_teams_channel(options):
         items.append({
             "type": "TextBlock",
             "text": title,
-            "size":"medium",
+            "size": "medium",
             "style": "heading"
 
         })
 
         # Imagem
-        if url_image: 
-            items.append({ "type": "Image", "url": url_image })
-        
+        if url_image:
+            items.append({"type": "Image", "url": url_image})
+
         # MENSAGEM
         for m in message:
             items.append({
@@ -259,11 +267,11 @@ def send_to_teams_channel(options):
             })
 
         # RODAPÉ
-        items.append({ "type": "TextBlock", "text": '-' })
+        items.append({"type": "TextBlock", "text": '-'})
         items.append({
             "type": "TextBlock",
             "text": subtitle,
-            "size":"small",
+            "size": "small",
             "style": "heading",
             "isSubtle": True
         })
@@ -282,39 +290,33 @@ def send_to_teams_channel(options):
         })
 
         default_payload = {
-            "type":"message",
-            "attachments":[
+            "type": "message",
+            "attachments": [
                 {
-                    "contentType":"application/vnd.microsoft.card.adaptive",
-                    "contentUrl":None,
-                    "content":{
-                        "$schema":"http://adaptivecards.io/schemas/adaptive-card.json",
-                        "type":"AdaptiveCard",
-                        "version":"1.2",
-                        "body":items
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "contentUrl": None,
+                    "content": {
+                        "$schema":
+                        "http://adaptivecards.io/schemas/adaptive-card.json",
+                        "type": "AdaptiveCard",
+                        "version": "1.2",
+                        "body": items
                     }
                 }
             ]
         }
-        
+
         url = channel
         payload = json.dumps(default_payload)
-        response = requests.post(url, payload)
+        requests.post(url, payload)
         # print('response', response.__dict__)
     except Exception as ex:
         print('Exception on send_to_teams_channel: ', str(ex))
     return options
 
-# def send_to_teams_channel(channel, title, subtitle, message):
-#     if not channel: return
-#     url = channel
-#     payload = json.dumps(format_message(title, subtitle, message))
-#     response = requests.post(url, payload)
-#     return response
 
-
-
-'''payload={
+"""
+payload={
         "@type": "MessageCard",
         "@context": "http://schema.org/extensions",
         "themeColor": "d70076",
@@ -322,13 +324,14 @@ def send_to_teams_channel(options):
         "sections": [{
             "activityTitle": "Larry Bryant created a new task",
             "activitySubtitle": "On Project Tango",
-            "activityImage": "https://i.imgur.com/IWRNYlR.png",
+            "activityImage": "https://i.imgur.com/IRNYlR.png",
             "facts": [{
                 "name": "Assigned to",
                 "value": "Unassigned"
             }, {
                 "name": "Due date",
-                "value": "Mon May 01 2017 17:07:18 GMT-0700 (Pacific Daylight Time)"
+                "value":
+                "Mon May 01 2017 17:07:18 GMT-0700 (Pacific Daylight Time)"
             }, {
                 "name": "Status",
                 "value": "Not started"
@@ -347,7 +350,8 @@ def send_to_teams_channel(options):
             "actions": [{
                 "@type": "HttpPOST",
                 "name": "Add comment",
-                "target": "https://docs.microsoft.com/outlook/actionable-messages"
+                "target":
+                "https://docs.microsoft.com/outlook/actionable-messages"
             }]
         }, {
             "@type": "ActionCard",
@@ -360,7 +364,8 @@ def send_to_teams_channel(options):
             "actions": [{
                 "@type": "HttpPOST",
                 "name": "Save",
-                "target": "https://docs.microsoft.com/outlook/actionable-messages"
+                "target":
+                "https://docs.microsoft.com/outlook/actionable-messages"
             }]
         }, {
             "@type": "OpenUri",
@@ -391,32 +396,32 @@ def send_to_teams_channel(options):
             "actions": [{
                 "@type": "HttpPOST",
                 "name": "Save",
-                "target": "https://docs.microsoft.com/outlook/actionable-messages"
+                "target":
+                "https://docs.microsoft.com/outlook/actionable-messages"
             }]
         }]
     }'''
 
 '''
     {
-   "type":"message",
-   "attachments":[
+   "type": "message",
+   "attachments": [
       {
-         "contentType":"application/vnd.microsoft.card.adaptive",
+         "contentType": "application/vnd.microsoft.card.adaptive",
          "contentUrl":null,
          "content":{
-            "$schema":"http://adaptivecards.io/schemas/adaptive-card.json",
-            "type":"AdaptiveCard",
-            "version":"1.2",
-            "body":[
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "type": "AdaptiveCard",
+            "version": "1.2",
+            "body": [
                 {
                 "type": "TextBlock",
-                "text": "For Samples and Templates, see [https://adaptivecards.io/samples](https://adaptivecards.io/samples)"
+                "text": "For Samples and Templates,\
+                    see https://adaptivecards.io/samples"
                 }
             ]
          }
       }
    ]
 }
-'''
-
-
+"""

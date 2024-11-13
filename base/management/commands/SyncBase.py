@@ -6,7 +6,8 @@ class Command(BaseCommand):
     help = 'Teste Command'
 
     def add_arguments(self, parser):
-        parser.add_argument('--params', nargs='+', help='Parâmetros(separados por vírgula)')
+        parser.add_argument('--params', nargs='+',
+                            help='Parâmetros(separados por vírgula)')
 
     def teste_ws_na_execucao_de_tasks(self):
         """
@@ -19,5 +20,3 @@ class Command(BaseCommand):
         Execução da rotina
         """
         self.teste_ws_na_execucao_de_tasks()
-
-

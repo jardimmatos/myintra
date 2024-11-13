@@ -1,10 +1,10 @@
-## game/consumers.py
 import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from users.tasks import set_user_logged_task
 from datetime import datetime
 from users.models import LoggedUser, User
 from asgiref.sync import sync_to_async
+
 
 class GlobalWebsocket2(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -79,12 +79,11 @@ class GlobalWebsocket2(AsyncJsonWebsocketConsumer):
             "payload": res,
         }))
 
+
 class GlobalWebsocket(AsyncJsonWebsocketConsumer):
-    # room_connection_counts = defaultdict(lambda: 0)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.room_connection_counts = 0
-        
 
     async def connect(self):
         # print('websocket socket scopes', self.scope)
@@ -94,20 +93,21 @@ class GlobalWebsocket(AsyncJsonWebsocketConsumer):
         # print('self.room_name', self.room_name)
         # print('self.room_group_name', self.room_group_name)
         # print('self.channel_name', self.channel_name)
-        
+
         if 'channel_session_user' in self.room_group_name:
             try:
                 uid = self.room_group_name.split('channel_session_user_')[1]
                 user = await sync_to_async(User.objects.get)(id=uid)
-                await sync_to_async(LoggedUser.objects.get_or_create)(user=user, defaults={'user':user})
-            except:
+                await sync_to_async(
+                    LoggedUser.objects.get_or_create)(
+                        user=user, defaults={'user': user})
+            except Exception:
                 pass
 
         # Join room group
-        await self.channel_layer.group_add (
+        await self.channel_layer.group_add(
             self.room_group_name,
-            self.channel_name
-        )
+            self.channel_name)
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -128,7 +128,7 @@ class GlobalWebsocket(AsyncJsonWebsocketConsumer):
         event = response.get("event", None)
         message = response.get("message", None)
         notify = response.get("notify", True)
-        
+
         obj = dict()
         obj = {
             'type': 'send_message',
@@ -139,10 +139,11 @@ class GlobalWebsocket(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_send(self.room_group_name, obj)
 
     async def send_message(self, res):
-        # print("websocket send_message", res, self.room_name, self.room_group_name)
+        # print(
+        # "websocket send_message", res, self.room_name,self.room_group_name)
         """ Receive message from room group """
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({ "payload": res }))
+        await self.send(text_data=json.dumps({"payload": res}))
 
 
 # Websocket teste para jogo da velha
@@ -206,12 +207,13 @@ class MyWebsocket(AsyncJsonWebsocketConsumer):
             "payload": res,
         }))
 
+
 class MyWebsocket2(AsyncJsonWebsocketConsumer):
-    
+
     async def connect(self):
         # print('on connecting')
 
-        #self.set_user_logged(str(self.scope['user']))
+        # self.set_user_logged(str(self.scope['user']))
 
         # Para permitir o ws apenas para usuários autenticados
         # self.user = self.scope['user']
@@ -219,7 +221,7 @@ class MyWebsocket2(AsyncJsonWebsocketConsumer):
         #     # accept connection if user is logged in
         #     self.accept()
         # else:
-        #     # don't accept connection if user is not logged in 
+        #     # don't accept connection if user is not logged in
         #     self.close()
 
         self.room_name = self.scope['url_route']['kwargs']['channel_code']
@@ -239,7 +241,7 @@ class MyWebsocket2(AsyncJsonWebsocketConsumer):
         # await self.send_status ()
 
     async def disconnect(self, close_code):
-        
+
         # print('on desconnecting', )
 
         # Leave room group
@@ -257,14 +259,15 @@ class MyWebsocket2(AsyncJsonWebsocketConsumer):
         response = json.loads(text_data)
         event = response.get("event", None)
         message = response.get("message", None)
-        
+
         if 'AnonymousUser' == str(self.scope['user']):
             return
 
         # try:
-        #     user = await database_sync_to_async(self.get_user)(str(self.scope['user']))
+        #     user = await database_sync_to_async(
+        # self.get_user)(str(self.scope['user']))
         #     print('user', user, user.is_authenticated)
-                
+
         # except Exception as e:
         #     print('ops receive ' + str(e))
         #     return
@@ -273,8 +276,11 @@ class MyWebsocket2(AsyncJsonWebsocketConsumer):
             # Send message to room group
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
-                'message': f'<div>{str(self.scope["user"])} - <small> {datetime.now()}</small></div>'+
-                                f'<div>{message}</div>',
+                'message': '<div>{} - <small> {}</small></div><div>{}</div>'
+                .format(
+                    str(self.scope["user"]),
+                    str(datetime.now()),
+                    message),
                 'event': "END"
             })
         if event == 'LOGGED':
