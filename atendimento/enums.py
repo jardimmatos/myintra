@@ -1,5 +1,5 @@
 from enum import Enum
-from django.utils.translation import gettext as _
+
 
 class StatusAtendimento(Enum):
     iniciado = 'Iniciado'
@@ -9,13 +9,16 @@ class StatusAtendimento(Enum):
     emitido = 'Emitido'
     transferido = 'Transferido'
 
+
 class ResolucaoAtendimento(Enum):
     pendente = 'Pendente'
     resolvido = 'Resolvido'
 
+
 class TypeSerials(Enum):
     simple = 'Serializador Simples'
     full = 'Serializador Completo'
+
 
 class OriginCallFilaSenha(Enum):
     triagem_senha = 0

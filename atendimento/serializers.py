@@ -4,27 +4,31 @@ from users.serializers import UserSimpleSerializer
 
 
 class UnidadeSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Unidade
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
 
 
 class LocalSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Local
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
 
 
 class PrioridadeSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Prioridade
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
 
 
 class DepartamentoSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Departamento
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
 
 
 class ServicoSimpleSerializer(serializers.ModelSerializer):
@@ -33,24 +37,26 @@ class ServicoSimpleSerializer(serializers.ModelSerializer):
         model = models.Servico
         fields = ('id', 'nome')
 
+
 class ServicoSerializer(serializers.ModelSerializer):
     departamento_object = DepartamentoSerializer()
 
     class Meta:
         model = models.Servico
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
 
 
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Cliente
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
 
 
 class PerfilSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Perfil
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
 
 
 class AtendenteSerializer(serializers.ModelSerializer):
@@ -62,14 +68,16 @@ class AtendenteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Atendente
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
-        read_only_fields = ('usuario_object', 'local_object', 'prioridade_object', 'unidade_object')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
+        read_only_fields = ('usuario_object', 'local_object',
+                            'prioridade_object', 'unidade_object')
 
 
 class AtendimentoSimpleSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Atendimento
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
 
 
 class AtendimentoFullSerializer(serializers.ModelSerializer):
@@ -85,7 +93,8 @@ class AtendimentoFullSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Atendimento
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')
+
 
 class AtendimentoComentarioSerializer(serializers.ModelSerializer):
     created_by_object = UserSimpleSerializer()
@@ -100,6 +109,7 @@ class AtendimentoComentarioSerializer(serializers.ModelSerializer):
 
 class PainelSenhaSerializer(serializers.ModelSerializer):
     atendimento_object = AtendimentoFullSerializer()
+
     class Meta:
         model = models.PainelSenha
-        exclude = ('created_at','updated_at', 'created_by', 'updated_by')
+        exclude = ('created_at', 'updated_at', 'created_by', 'updated_by')

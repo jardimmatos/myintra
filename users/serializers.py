@@ -1,10 +1,9 @@
 from rest_framework import serializers
 from . import models
-from django.utils.translation import gettext as _
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
-#from base.models import GlobalSetting
+
 
 class ContentTypeSerializer(serializers.ModelSerializer):
 
@@ -34,37 +33,36 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_user_count_bis(self, obj):
         return obj.user_count_bis
-    
+
     def get_is_atendente(self, obj):
         return obj.is_atendente
 
     def get_get_imagem(self, obj):
         return obj.get_imagem
-    
+
     class Meta:
         model = models.User
         exclude = ('password', 'groups', 'user_permissions', 'token', 'imagem')
-        read_only_fields = ['created_by','updated_by', 'date_joined', 'last_login', 'get_imagem', 'is_atendente']
-    
+        read_only_fields = ('created_by', 'updated_by', 'date_joined',
+                            'last_login', 'get_imagem', 'is_atendente')
+
     def validate(self, data):
-        #if not data.get('first_name'):
-        #    raise serializers.ValidationError(_("Primeiro nome não informado"))
+        # if not data.get('first_name'):
+        #    raise serializers.ValidationError("Primeiro nome não informado")
         return data
 
     def create(self, validated_data):
         if not validated_data.get('username'):
-            raise serializers.ValidationError(_("Nome de usuário não informado"))
-        
+            raise serializers.ValidationError("Nome de usuário não informado")
+
         # Registrar stamps
         validated_data['created_by'] = self.context.get('request').user
         validated_data['created_at'] = datetime.now()
-        
-        # separar(e remover do dict) username, password e e-mail para parâmetros da função .create_user()
+
+        # separar(e remover do dict) username, password e e-mail para
+        # parâmetros da função .create_user()
         username = validated_data.pop('username')
-        
-        #gs = GlobalSetting.objects.first()
-        #if not gs:
-        #    password = '123456'
+
         password = '123456'
         email = validated_data.pop('email', None)
 
@@ -72,13 +70,14 @@ class UserSerializer(serializers.ModelSerializer):
         validated_data['is_superuser'] = False
         validated_data['is_staff'] = False
         validated_data['is_active'] = True
-    
-        user = models.User.objects.create_user(username, email, password,**validated_data)
 
+        user = models.User.objects.create_user(
+            username, email, password, **validated_data)
         return user
 
     def update(self, instance, validated_data):
-        validated_data['updated_by'] = self.context.get('request').user or instance.updated_by
+        validated_data['updated_by'] = (
+            self.context.get('request').user or instance.updated_by)
         validated_data['updated_at'] = datetime.now()
 
         # action set_auper exclusiva para esta prop
@@ -94,14 +93,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PasswordSerializer(serializers.Serializer):
-    password = serializers.CharField(write_only=True, required=True )
+    password = serializers.CharField(write_only=True, required=True)
+
 
 class TokenSerializer(serializers.Serializer):
-    token = serializers.CharField(write_only=True, required=True )
+    token = serializers.CharField(write_only=True, required=True)
+
 
 class UserAdminSerializer(serializers.Serializer):
     is_staff = serializers.BooleanField(required=False, write_only=True)
     is_active = serializers.BooleanField(required=False, write_only=True)
+
 
 class UserSuperSerializer(serializers.Serializer):
     is_superuser = serializers.BooleanField()
@@ -124,9 +126,10 @@ class GroupPermissionsSerializer(serializers.ModelSerializer):
         model = Group
         fields = '__all__'
 
+
 # serializa grupos e permissões em usuários
 class UserFullSerializer(serializers.ModelSerializer):
-    #groups = GroupPermissionsSerializer(many=True, read_only=True)
+    # groups = GroupPermissionsSerializer(many=True, read_only=True)
     get_groups = serializers.SerializerMethodField()
     get_perms = serializers.SerializerMethodField()
     # get_filiais = serializers.SerializerMethodField()
@@ -137,42 +140,29 @@ class UserFullSerializer(serializers.ModelSerializer):
 
     def get_user_count_bis(self, obj):
         return obj.user_count_bis
-    
+
     def get_is_atendente(self, obj):
         return obj.is_atendente
 
-    # def get_user_is_gestor(self, obj):
-    #     return obj.is_gestor
-    
-    # def get_get_imagem(self, obj):
-    #     return obj.get_imagem
-
-    # def get_get_filiais(self, obj):
-    #     return [ 
-    #         {'coligada': filial.coligada.codcoligada,
-    #         'codfilial': filial.codfilial,
-    #         'codtipocurso': filial.codtipocurso,
-    #         'filial_codtipocurso_label': filial.filial_codtipocurso_label(),
-    #         'descricao': filial.descricao}
-    #         for filial in obj.filiais.all()]
-
     def get_get_groups(self, obj):
-        return [ group.name for group in obj.groups.all()]
-    
+        return [group.name for group in obj.groups.all()]
+
     def get_get_perms(self, obj):
-        perms = [ perm.codename for perm in obj.user_permissions.all()]
+        perms = [perm.codename for perm in obj.user_permissions.all()]
         groups = obj.groups.all()
         for g in groups:
-            perms += [ perm.codename for perm in g.permissions.exclude(codename__in=perms).all()]
+            perms += [
+                perm.codename
+                for perm in g.permissions.exclude(codename__in=perms).all()]
         return perms
 
     class Meta:
         model = models.User
         exclude = ('password', )
-        read_only_fields = ['created_by','updated_by', 'perms','groups', ]
+        read_only_fields = ('created_by', 'updated_by', 'perms', 'groups',)
+
 
 class UserSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ('id','username','email', 'first_name', 'last_name')
-
+        fields = ('id', 'username', 'email', 'first_name', 'last_name')

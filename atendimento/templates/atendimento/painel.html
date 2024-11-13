@@ -54,7 +54,7 @@
         }
         .item-historico-local{
             font-size: 2vw;
-            font-weight: bold; 
+            font-weight: bold;
         }
         .item-historico-prioridade{
             font-size: 1.5vw;
@@ -173,7 +173,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Modal Configurações -->
         <div class="modal fade" id="modalConfig" tabindex="-1" aria-labelledby="modalConfigLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -208,7 +208,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <h5>Senha Normal</h5>
                         <div class="row">
                             <div class="col-6">
@@ -232,7 +232,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <h5>Senha Prioridade</h5>
                         <div class="row">
                             <div class="col-6">
@@ -256,7 +256,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <h5>Histórico de Senhas</h5>
                         <div class="row">
                             <div class="col-6">
@@ -280,7 +280,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <h5>Rodapé</h5>
                         <div class="row">
                             <div class="col-6">
@@ -345,7 +345,7 @@
             </div>
         </div>
     </div>
-    
+
     <script src="{% static 'intranet/atendimento/vue.js'%}"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -445,7 +445,7 @@
                 const blinkInterval = setInterval(() => {
                     this.isBlinking = !this.isBlinking;
                     blinkCount++;
-                    
+
                     // Para após 3 blinks (6 alterações de estado)
                     if (blinkCount >= maxBlinks * 2) {
                         clearInterval(blinkInterval);
@@ -748,6 +748,6 @@
         }
     })
     </script>
-    
+
 </body>
 </html>

@@ -5,6 +5,7 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 # from django.utils.translation import gettext_lazy as _
 
+
 # created a custom ModelBackend authenticate to auth with only token
 class AbstractTokenAuthentication(ModelBackend):
 
@@ -12,7 +13,9 @@ class AbstractTokenAuthentication(ModelBackend):
 
         try:
             token = request.query_params.get('token')
-            auth = get_user_model().objects.exclude(token__isnull=True).get(token = token)
+            users_with_token = get_user_model().objects.exclude(
+                token__isnull=True)
+            auth = users_with_token.get(token=token)
             try:
                 # Registrar requisições de API
                 if True:
@@ -22,29 +25,38 @@ class AbstractTokenAuthentication(ModelBackend):
                     data['view_data_post'] = str(request.data)
                     data['view_query_params_get'] = str(request.query_params)
                     try:
-                        data['view_data_get'] = str(request.parser_context.get('view').get('basename').data)[:5000]
-                    except:
-                        ...
-                    data['view_basename'] = request.parser_context.get('view').basename
-                    data['view_action'] = request.parser_context.get('view').action
-                    data['view_pk'] = request.parser_context.get('kwargs').get('pk')
+                        data['view_data_get'] = str(
+                            request.parser_context.get('view').get('basename')
+                            .data
+                            )[:5000]
+                    except Exception:
+                        pass
+                    data['view_basename'] = request.parser_context\
+                        .get('view').basename
+                    data['view_action'] = request.parser_context\
+                        .get('view').action
+                    data['view_pk'] = request.parser_context\
+                        .get('kwargs').get('pk')
                     data['view_method'] = request._request.method
                     ApiRequests.objects.create(**data)
             except Exception as e:
                 print('Exceptions on request token Authentication', e)
-        except:
+        except Exception:
             auth = None
         return auth
 
 
-# create a custom BaseAuthentication to authenticate user with a generated token model field on 
+# create a custom BaseAuthentication to authenticate user with a generated
+# token model field on
 # request with query_param token
 class TokenAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
         try:
-            auth = User.objects.exclude(token__isnull=True).get(token = request.query_params.get('token'))
-        except:
+            token = request.query_params.get('token')
+            users_with_token = User.objects.exclude(token__isnull=True)
+            auth = users_with_token.get(token=token)
+        except Exception:
             auth = None
 
         if not auth:
@@ -61,4 +73,3 @@ class TokenAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed('Usuário inativo')
 
         return (user, None)
-
